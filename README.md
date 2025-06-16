@@ -106,9 +106,28 @@ To decipher a secret message (`secret_message.txt`) using a training file (`warp
 ./run_deciphering -i ../data/warpeace_input.txt -d secret_message.txt
 
 # With more iterations and saving the output to a file
-./run_deciphering -i ../data/shakespeare_input.txt -d secret_message.txt -iters 1000000 -o deciphered_text.txt
+./run_deciphering -i ../data/shakespeare_input.txt -d ../data/secret_message_2.txt -iters 500000 -print_every 100000 -o ../data/output_this_is_water.txt
 ```
 
 This command will launch multiple parallel MCMC chains and, after they complete, print the best-guess deciphered text to the console and save it to `deciphered_text.txt` if the `-o` flag is used.
 
+
+## Performance Analysis: C++ vs. Python
+
+The rewrite of the MCMC substitution cipher solver from Python to C++ yields substantial improvements in both speed and deciphering quality. Below is a comparison of the two implementations using the same training file (`shakespeare_input.txt`) and similar iteration counts:
+
+| Implementation | Training File        | Iterations   | Time (seconds) | 
+|----------------|----------------------|--------------|----------------|
+| C++            | shakespeare_input.txt| 500,000      | 14.598         |
+| Python         | shakespeare_input.txt| 3 × 500,000  | 1403.91        |
+
+### Key Observations:
+- **Speed**: The C++ implementation is over **95× faster** than the Python version when accounting for total iterations (The C++ version ran with 8 threads).
+- **Quality**: The output from C++ is more accurate and readable, likely due to algorithmic improvements (pre-computed counts, simulated annealing, etc.) and higher effective throughput.
+- **Scalability**: The multithreaded C++ version completes long simulations in seconds, making it practical for real-time applications or multiple runs.
+
+
+# Notes
 It is worth noting that through my many runs of this, I have found that training on `shakespeare_input.txt` produces significantly better results. This is most likely because its much longer that `warpeace_input.txt`
+
+Also, the python implementation can't scramble this_is_water because it encounters unrecognized characters. The C++ version was able to operate on it as usual.
